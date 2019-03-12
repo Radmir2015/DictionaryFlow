@@ -27,13 +27,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+//    fun <R: Any?> readPropery(instance: Model.Result, propertyName: String): R {
+//        val clazz = instance.javaClass.kotlin
+//        @Suppress("UNCHECKED_CAST")
+//        return clazz.members.first { it.name == propertyName }.get(instance) as R
+//    }
+
     private fun beginSearch(searchWord: String) {
         disposable = wordsApiService.getWordsInformation(searchWord)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { result -> textView.text = "Definition: ${result.results}\n" +
-                        "Frequency: ${result.frequency} ${result}" },
+                { result -> textView.text = "${result.mpronunciation} ${result}" },
                 { error -> Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show() }
             )
     }

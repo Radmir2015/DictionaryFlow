@@ -1,5 +1,7 @@
 package com.example.dictionaryflow
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import io.reactivex.Observable
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -17,9 +19,13 @@ interface WordsApiService {
     companion object {
         fun create(): WordsApiService {
 
+            val gson: Gson = GsonBuilder()
+                .registerTypeAdapter(Model.Result::class.java, Model.Result.ResultsDeserializer())
+                .create()
+
             val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .baseUrl("https://wordsapiv1.p.rapidapi.com/")
                 .build()
 
