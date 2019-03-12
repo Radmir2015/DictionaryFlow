@@ -37,4 +37,9 @@ class MainActivity : AppCompatActivity() {
                 { error -> Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show() }
             )
     }
+
+    override fun onPause() {
+        super.onPause()
+        disposable?.dispose()
+    }
 }
