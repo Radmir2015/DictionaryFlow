@@ -2,49 +2,45 @@ package com.example.dictionaryflow
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import android.support.design.widget.BottomNavigationView
+import android.support.v4.app.Fragment
+import android.view.MenuItem
 
 class MainActivity : AppCompatActivity() {
-
-    private var disposable: Disposable? = null
-
-    private val wordsApiService by lazy {
-        WordsApiService.create()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        button.setOnClickListener {
-            if (editText.text.toString().isNotEmpty()) {
-                beginSearch(editText.text.toString())
-            }
+        val navigation: BottomNavigationView = findViewById(R.id.navigation)
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        val firstTab = SearchFragment()
+        loadFragment(firstTab)
+    }
+
+    private val mOnNavigationItemSelectedListener = object : BottomNavigationView.OnNavigationItemSelectedListener {
+        override fun onNavigationItemSelected(item: MenuItem): Boolean {
+            val selectedFragment: Fragment? =
+                when (item.itemId) {
+                    R.id.navigation_saved -> SavedFragment()
+                    R.id.navigation_search -> SearchFragment()
+                    R.id.navigation_about -> AboutFragment()
+                    else -> null
+                }
+
+            return if (selectedFragment != null) {
+                loadFragment(selectedFragment)
+                true
+            } else
+                false
         }
     }
 
-//    fun <R: Any?> readPropery(instance: Model.Result, propertyName: String): R {
-//        val clazz = instance.javaClass.kotlin
-//        @Suppress("UNCHECKED_CAST")
-//        return clazz.members.first { it.name == propertyName }.get(instance) as R
-//    }
-
-    private fun beginSearch(searchWord: String) {
-        disposable = wordsApiService.getWordsInformation(searchWord)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result -> textView.text = "${result.mpronunciation} ${result}" },
-                { error -> Toast.makeText(this, error.message, Toast.LENGTH_SHORT).show() }
-            )
-    }
-
-    override fun onPause() {
-        super.onPause()
-        disposable?.dispose()
+    private fun loadFragment(fragment: Fragment) {
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.fl_content, fragment)
+        ft.addToBackStack(null)
+        ft.commit()
     }
 }
