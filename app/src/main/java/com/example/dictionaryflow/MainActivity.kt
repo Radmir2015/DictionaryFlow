@@ -1,20 +1,17 @@
 package com.example.dictionaryflow
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 
 class MainActivity : AppCompatActivity() {
 
-    val searchTab = SearchFragment()
-    val savedTab = SavedFragment()
-    val aboutTab = AboutFragment()
-    var currentTab: Fragment = searchTab
-    var currentTabTag: String? = null
-    val fm = supportFragmentManager
-    val fragmentsTags = arrayOf("search", "saved", "about")
+    private var currentTabTag: String? = null
+    private val fm: FragmentManager = supportFragmentManager
+    private val fragmentsTags = arrayOf("search", "saved", "about")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +36,7 @@ class MainActivity : AppCompatActivity() {
             else
                 "search"
 
-        ShowFragment(currentTabTag as String)
-//        showFragment(currentTab)
+        showFragment(currentTabTag as String)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -48,9 +44,8 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    private fun ShowFragment(showTag: String, frTags: Array<String> = fragmentsTags) {
+    private fun showFragment(showTag: String, frTags: Array<String> = fragmentsTags) {
         val tags = frTags.filter { it != showTag }
-
         val temp = fm.beginTransaction().show(fm.findFragmentByTag(showTag) as Fragment)
 
         for (tag in tags)
@@ -63,30 +58,19 @@ class MainActivity : AppCompatActivity() {
 
     private val mOnNavigationItemSelectedListener = object : BottomNavigationView.OnNavigationItemSelectedListener {
         override fun onNavigationItemSelected(item: MenuItem): Boolean {
-            //val selectedFragment: Fragment? =
-            //currentTab =
-                when (item.itemId) {
-                    R.id.navigation_saved -> ShowFragment("saved") //savedTab //SavedFragment()
-                    R.id.navigation_search -> ShowFragment("search") //searchTab //SearchFragment()
-                    R.id.navigation_about -> ShowFragment("about") // aboutTab //AboutFragment()
-                    //else -> null
-                }
-
-            //showFragment(currentTab)
-
-//            return if (selectedFragment != null) {
-//                showFragment(selectedFragment)
-//                true
-//            } else
-//                false
+            when (item.itemId) {
+                R.id.navigation_saved -> showFragment("saved")
+                R.id.navigation_search -> showFragment("search")
+                R.id.navigation_about -> showFragment("about")
+            }
             return true
         }
     }
 
-    private fun showFragment(fragment: Fragment) {
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.fl_content, fragment)
-        ft.addToBackStack(null)
-        ft.commit()
-    }
+//    private fun showFragment(fragment: Fragment) {
+//        val ft = supportFragmentManager.beginTransaction()
+//        ft.replace(R.id.fl_content, fragment)
+//        ft.addToBackStack(null)
+//        ft.commit()
+//    }
 }

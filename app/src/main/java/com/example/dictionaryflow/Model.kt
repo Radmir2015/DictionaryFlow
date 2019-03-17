@@ -1,27 +1,16 @@
 package com.example.dictionaryflow
 
-import com.google.gson.annotations.SerializedName
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import com.google.gson.Gson
-import android.text.TextUtils
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
 import java.lang.reflect.Type
 
 
 object Model {
     data class Result(
         val results: ArrayList<Results>?,
-        val syllables: Syllables,
-//        @SerializedName("pronunciation")
-//        val pronunciationObject: Pronunciation,
-//        @SerializedName("pronunciation")
-//        val pronunciationPlain: String,
-
+        val syllables: Syllables?,
         var mpronunciation: String?,
+        val word: String?,
         val frequency: Number
     ) {
         fun setPronunciationValues(pronunciationValues: Any) {
@@ -31,10 +20,6 @@ object Model {
                 else -> null
             }
         }
-
-//        fun setPronunciationValues(pronunciationValues: String) {
-//            pronunciation = Pronunciation(pronunciationValues)
-//        }
 
         class ResultsDeserializer : JsonDeserializer<Model.Result> {
 
@@ -46,19 +31,15 @@ object Model {
                 if (jsonObject.has("pronunciation")) {
                     val elem = jsonObject.get("pronunciation")
                     if (elem != null && !elem.isJsonNull) {
-                        //val valuesString = elem.asString
-
-                        //if (!TextUtils.isEmpty(valuesString)) {
-                            val values: Any =
-                                if (!elem.isJsonObject)
-                                    elem.asString
-                                else
-                                    Gson().fromJson<Pronunciation>(
-                                        elem,
-                                        object : TypeToken<Pronunciation>() {
-                                    }.type)
-                            resultJSON.setPronunciationValues(values)
-                        //}
+                        val values: Any =
+                            if (!elem.isJsonObject)
+                                elem.asString
+                            else
+                                Gson().fromJson<Pronunciation>(
+                                    elem,
+                                    object : TypeToken<Pronunciation>() {
+                                }.type)
+                        resultJSON.setPronunciationValues(values)
                     }
                 }
                 return resultJSON
