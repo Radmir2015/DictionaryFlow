@@ -34,7 +34,18 @@ class SearchFragment : Fragment() {
             }
         }
 
+        if (savedInstanceState != null) {
+            fragmentsView.editText.setText(savedInstanceState.getString("search_word"))
+            fragmentsView.textView.text = savedInstanceState.getString("result")
+        }
+
         return fragmentsView
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("search_word", editText.text.toString())
+        outState.putString("result", textView.text.toString())
+        super.onSaveInstanceState(outState)
     }
 
     companion object {
