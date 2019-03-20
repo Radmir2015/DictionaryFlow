@@ -68,7 +68,10 @@ object Model {
         val derivation: ArrayList<String>?,
         val similarTo: ArrayList<String>?,
         val examples: ArrayList<String>?,
-        val usageOf: ArrayList<String>?
+        val usageOf: ArrayList<String>?,
+        val hasUsages: ArrayList<String?>,
+        val verbGroup: ArrayList<String?>,
+        val entails: ArrayList<String?>
     )
 
     data class Syllables (

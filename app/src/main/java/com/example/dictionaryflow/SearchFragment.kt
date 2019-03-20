@@ -2,10 +2,10 @@ package com.example.dictionaryflow
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 import android.widget.Toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -17,6 +17,10 @@ import kotlinx.android.synthetic.main.search_fragment.view.*
 class SearchFragment : Fragment() {
 
     private var disposable: Disposable? = null
+
+    private var wordParts: ArrayList<String?>? = ArrayList()
+    private var titleWordParts: ArrayList<String?>? = ArrayList()
+    private var wordAdapter: WordPartsAdapter? = null
 
     private val wordsApiService by lazy {
         WordsApiService.create()
@@ -35,21 +39,30 @@ class SearchFragment : Fragment() {
             }
         }
 
-        fragmentsView.textView.movementMethod = ScrollingMovementMethod()
+        val wordListView = fragmentsView.findViewById<ListView>(R.id.wordListView)
 
-//        if (savedInstanceState != null) {
-//            fragmentsView.editText.setText(savedInstanceState.getString("search_word"))
-//            fragmentsView.textView.text = savedInstanceState.getString("result")
-//        }
+        if (savedInstanceState != null) {
+
+            wordParts = savedInstanceState.getStringArrayList("word_parts")
+            titleWordParts = savedInstanceState.getStringArrayList("title_word_parts")
+
+            if (wordParts != null && titleWordParts != null)
+                wordAdapter = WordPartsAdapter(activity, wordParts, titleWordParts)
+            //wordAdapter?.notifyDataSetChanged()
+        } else
+            wordAdapter = WordPartsAdapter(activity, wordParts, titleWordParts)
+
+        wordListView.adapter = wordAdapter
 
         return fragmentsView
     }
 
-//    override fun onSaveInstanceState(outState: Bundle) {
-//        outState.putString("search_word", editText.text.toString())
-//        outState.putString("result", textView.text.toString())
-//        super.onSaveInstanceState(outState)
-//    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putStringArrayList("word_parts", wordParts)
+        outState.putStringArrayList("title_word_parts", titleWordParts)
+    }
 
     companion object {
 
@@ -64,29 +77,38 @@ class SearchFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result -> run {
+                    wordParts?.clear()
+                    titleWordParts?.clear()
+
+                    wordAdapter?.notifyDataSetChanged()
+
                     val order = DescriptionModel.CallOrder(result).getOrder()
                     val results = DescriptionModel.CallOrder(result).getResultsOrder()
-                    var total = ""
+
 
                     order.forEach {
-                        if (it.value != null)
-                            total += "${it.title}\n${it.description}\n\n"
-                    }
-
-                    results.forEach {
-                        it.forEach { elem ->
-                            if (elem.value != null)
-                                total += "${elem.title}\n" +
-                                        "${elem.description}\n" +
-                                        "\n"
+                        if (it.value != null) {
+                            titleWordParts?.add(it.title)
+                            wordParts?.add(it.description)
                         }
-                        total += "\n"
                     }
 
-                    textView.text = total
+                    results.forEachIndexed { index, it ->
+                        it.forEach { elem ->
+                            if (elem.value != null) {
+                                titleWordParts?.add("${elem.title} №${index + 1}")
+                                wordParts?.add(elem.description)
+                            }
+                        }
+                    }
+
+                    wordAdapter?.notifyDataSetChanged()
                     }
                 },
-                { error -> Toast.makeText(activity, error.message, Toast.LENGTH_SHORT).show() }
+                { error -> run {
+                    Toast.makeText(activity, error.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
             )
     }
 
