@@ -9,19 +9,10 @@ object DescriptionModel {
 
     class CallOrder(private val obj: Model.Result) {
 
-//        fun getOrder(): List<String> {
-//            val result = ArrayList<String>()
-//            for (prop in Model.Result::class.declaredMemberProperties) {
-//                if (prop.name == "results")
-//                    for (prop1 in Model.Results::class.declaredMemberProperties)
-//                        result.add("${prop1.name} = ${prop1.get(prop.get(this.obj) as Model.Results)}")
-//            }
-//            return result.subList(0, 1)
-//        }
-
         fun getOrder(): List<Description> {
             return listOf(
-                Description( "Pronunciation", "This word pronunciation is ${obj.mpronunciation}", obj.mpronunciation),
+                Description("Word", "The word is \"${obj.word}\"", obj.word),
+                Description( "Pronunciation", "This word's pronunciation is [${obj.mpronunciation}]", obj.mpronunciation),
                 Description( "Syllables", "This word contains ${obj.syllables?.count} syllables, such as ${obj.syllables?.list}", obj.syllables?.list),
                 Description( "Frequency", "Frequency of the word: ${obj.frequency}", obj.frequency)
             )
@@ -60,28 +51,31 @@ object DescriptionModel {
             }
             return result
         }
-
-//        fun getOrder3(): List<String> {
-//            val result = ArrayList<String>()
-//            val temp = getOrder2()
-//            temp.next()
-//            temp.next()
-//            val temp1 = (temp.next() as ArrayList<String>).iterator()
-//            if (temp1.hasNext())
-//                result.add(DescriptionModel.Describe((temp1.next() as Model.Results).definition).getTitle())
-//            if (temp1.hasNext())
-//                result.add(temp1.next())
-//            return result
-//        }
-
     }
 
-//    class Container(vararg values: String) : Iterator<Any> {
-//        private val iter: Iterator<String> = values.iterator()
-//
-//        override fun hasNext(): Boolean = iter.hasNext()
-//
-//        override fun next(): Any = iter.next()
-//    }
+    data class TitleDescription(val titles: ArrayList<String?>?, val descriptions: ArrayList<String?>?)
 
+    fun getTitlesAndDescriptions(result: Model.Result?): TitleDescription {
+        val order = DescriptionModel.CallOrder(result!!).getOrder()
+        val results = DescriptionModel.CallOrder(result).getResultsOrder()
+        val tempTitles: ArrayList<String?>? = ArrayList()
+        val tempDescriptions: ArrayList<String?>? = ArrayList()
+
+        order.forEach { item ->
+            if (item.value != null) {
+                tempTitles?.add(item.title)
+                tempDescriptions?.add(item.description)
+            }
+        }
+
+        results.forEachIndexed { index, item ->
+            item.forEach { elem ->
+                if (elem.value != null) {
+                    tempTitles?.add("${elem.title} №${index + 1}")
+                    tempDescriptions?.add(elem.description)
+                }
+            }
+        }
+        return TitleDescription(tempTitles, tempDescriptions)
+    }
 }

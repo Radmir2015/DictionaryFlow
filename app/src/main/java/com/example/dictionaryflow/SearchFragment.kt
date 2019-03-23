@@ -12,6 +12,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.search_fragment.*
 import kotlinx.android.synthetic.main.search_fragment.view.*
+import org.greenrobot.eventbus.EventBus
 
 
 class SearchFragment : Fragment() {
@@ -48,7 +49,7 @@ class SearchFragment : Fragment() {
 
             if (wordParts != null && titleWordParts != null)
                 wordAdapter = WordPartsAdapter(activity, wordParts, titleWordParts)
-            //wordAdapter?.notifyDataSetChanged()
+
         } else
             wordAdapter = WordPartsAdapter(activity, wordParts, titleWordParts)
 
@@ -82,27 +83,19 @@ class SearchFragment : Fragment() {
 
                     wordAdapter?.notifyDataSetChanged()
 
-                    val order = DescriptionModel.CallOrder(result).getOrder()
-                    val results = DescriptionModel.CallOrder(result).getResultsOrder()
+                    EventBus.getDefault().post(WordAndObjectEvent(result.word, result))
 
+                    val titlesAndDescriptionData = DescriptionModel.getTitlesAndDescriptions(result)
 
-                    order.forEach {
-                        if (it.value != null) {
-                            titleWordParts?.add(it.title)
-                            wordParts?.add(it.description)
-                        }
-                    }
+                    titleWordParts = titlesAndDescriptionData.titles
+                    wordParts = titlesAndDescriptionData.descriptions
 
-                    results.forEachIndexed { index, it ->
-                        it.forEach { elem ->
-                            if (elem.value != null) {
-                                titleWordParts?.add("${elem.title} №${index + 1}")
-                                wordParts?.add(elem.description)
-                            }
-                        }
-                    }
+                    wordAdapter?.setTitleItems(titleWordParts)
+                    wordAdapter?.setItems(wordParts)
 
                     wordAdapter?.notifyDataSetChanged()
+
+                    wordListView.setSelectionAfterHeaderView()
                     }
                 },
                 { error -> run {

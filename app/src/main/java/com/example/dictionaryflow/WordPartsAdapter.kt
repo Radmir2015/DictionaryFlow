@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
-class WordPartsAdapter(private var activity: FragmentActivity?, private val items: ArrayList<String?>?, private val titleItems: ArrayList<String?>?): BaseAdapter() {
+class WordPartsAdapter(private var activity: FragmentActivity?, private var items: ArrayList<String?>?, private var titleItems: ArrayList<String?>?): BaseAdapter() {
 
     private class ViewHolder(row: View?) {
         var txtBold: TextView? = null
@@ -33,15 +33,18 @@ class WordPartsAdapter(private var activity: FragmentActivity?, private val item
             viewHolder = view.tag as ViewHolder
         }
 
-//        val resStr = items[position]
-//        if (position % 2 == 0)
-//            viewHolder.txtBold?.text = resStr
-//        else
-//            viewHolder.txtName?.text = resStr
         viewHolder.txtBold?.text = titleItems?.get(position)
         viewHolder.txtName?.text = items?.get(position)
 
         return view as View
+    }
+
+    fun setItems(items: ArrayList<String?>?) {
+        this.items = items
+    }
+
+    fun setTitleItems(titleItems: ArrayList<String?>?) {
+        this.titleItems = titleItems
     }
 
     override fun getItem(i: Int): String? {
