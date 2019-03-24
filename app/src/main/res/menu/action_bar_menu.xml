@@ -3,7 +3,7 @@
     <item
         android:id="@+id/favorite"
         android:icon="@android:color/transparent"
-        android:title="Add to the Favorites"
+        android:title="@string/fav_title"
         app:showAsAction="always"
         android:orderInCategory="0"/>
 </menu>

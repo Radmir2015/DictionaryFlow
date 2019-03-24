@@ -71,12 +71,12 @@ class SavedFragment : Fragment() {
         favAdapter?.notifyDataSetChanged()
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
     }
 
-    public override fun onStop() {
+    override fun onStop() {
         EventBus.getDefault().unregister(this)
         super.onStop()
     }

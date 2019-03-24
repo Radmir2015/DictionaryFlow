@@ -73,8 +73,7 @@ class MainActivity : AppCompatActivity() {
         outState?.putBoolean("favorited", favorited)
         outState?.putString("displayedWord", displayedWord)
         outState?.putString("displayedObj", Gson().toJson(displayedObj))
-//        outState?.putString("dbHelper", Gson().toJson(dbHelper))
-        dbHelper = FavoritesDbHelper(this)
+
         super.onSaveInstanceState(outState)
     }
 
@@ -153,10 +152,11 @@ class MainActivity : AppCompatActivity() {
                 unsetIcon()
                 addableToFavorites = false
             } else {
-                if (favoriteWasShown)
+                if (favoriteWasShown) {
                     if (favorited) setFavorited()
                     else setUnfavorited()
-                addableToFavorites = true
+                    addableToFavorites = true
+                }
             }
 
             return true

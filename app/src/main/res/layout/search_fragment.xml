@@ -14,7 +14,7 @@
                   android:orientation="horizontal">
 
         <EditText
-                android:layout_width="262dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:ems="10"
@@ -25,9 +25,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginEnd="8dp" app:layout_constraintEnd_toStartOf="@+id/button"
                 android:layout_marginTop="4dp" app:layout_constraintTop_toTopOf="parent"
-                android:hint="Type here any english word..."/>
+                android:hint="@string/search_input_placeholder"/>
         <Button
-                android:text="Search"
+                android:text="@string/search_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/button"
