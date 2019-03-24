@@ -2,11 +2,13 @@ package com.example.dictionaryflow
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.Toast
+import com.google.gson.JsonParser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -22,6 +24,7 @@ class SearchFragment : Fragment() {
     private var wordParts: ArrayList<String?>? = ArrayList()
     private var titleWordParts: ArrayList<String?>? = ArrayList()
     private var wordAdapter: WordPartsAdapter? = null
+    private var apiKey: String? = null
 
     private val wordsApiService by lazy {
         WordsApiService.create()
@@ -55,6 +58,8 @@ class SearchFragment : Fragment() {
 
         wordListView.adapter = wordAdapter
 
+        apiKey = Config(activity).key
+
         return fragmentsView
     }
 
@@ -73,7 +78,7 @@ class SearchFragment : Fragment() {
     }
 
     private fun beginSearch(searchWord: String) {
-        disposable = wordsApiService.getWordsInformation(searchWord)
+        disposable = wordsApiService.getWordsInformation(apiKey!!, searchWord)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -108,5 +113,14 @@ class SearchFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         disposable?.dispose()
+    }
+
+    data class Config(val mContext: FragmentActivity?, var key: String = "") {
+        init {
+            this.key =
+                JsonParser().parse(
+                    mContext?.assets?.open("config.json")?.bufferedReader().use { it?.readText() })
+                    .asJsonObject.get("key").toString().replace("\"", "")
+        }
     }
 }
